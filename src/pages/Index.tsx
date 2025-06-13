@@ -1,13 +1,25 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { CRMSidebar } from "@/components/CRMSidebar";
+import { Dashboard } from "@/components/Dashboard";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-slate-50">
+        <CRMSidebar />
+        <main className="flex-1">
+          <div className="border-b border-slate-200 bg-white p-4 flex items-center">
+            <SidebarTrigger className="mr-4" />
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-slate-500">Bienvenido a</span>
+              <span className="font-semibold text-slate-900">SalesHub CRM</span>
+            </div>
+          </div>
+          <Dashboard />
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
