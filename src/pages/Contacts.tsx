@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Search, Mail, Phone, Building2, User, Edit, Trash2 } from "lucide-react";
 import { AddContactDialog } from "@/components/AddContactDialog";
+import { EditContactDialog } from "@/components/EditContactDialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 // Datos de ejemplo para contactos
-const mockContacts = [
+const initialContacts = [
   {
     id: 1,
     name: "Ana García",
@@ -60,9 +62,12 @@ const mockContacts = [
 ];
 
 const Contacts = () => {
-  const [contacts, setContacts] = useState(mockContacts);
+  const [contacts, setContacts] = useState(initialContacts);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<any>(null);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,6 +102,30 @@ const Contacts = () => {
       avatar: ""
     };
     setContacts([...contacts, contact]);
+  };
+
+  const handleUpdateContact = (updatedContact: any) => {
+    setContacts(contacts.map(contact => 
+      contact.id === updatedContact.id ? updatedContact : contact
+    ));
+  };
+
+  const handleDeleteContact = () => {
+    if (selectedContact) {
+      setContacts(contacts.filter(contact => contact.id !== selectedContact.id));
+      setSelectedContact(null);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  const openEditDialog = (contact: any) => {
+    setSelectedContact(contact);
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (contact: any) => {
+    setSelectedContact(contact);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -252,10 +281,10 @@ const Contacts = () => {
                           <TableCell>{contact.lastContact}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end space-x-2">
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" onClick={() => openEditDialog(contact)}>
                                 <Edit className="w-4 h-4" />
                               </Button>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(contact)}>
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
@@ -275,6 +304,21 @@ const Contacts = () => {
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         onAddContact={handleAddContact}
+      />
+
+      <EditContactDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        contact={selectedContact}
+        onUpdateContact={handleUpdateContact}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Eliminar Contacto"
+        description="¿Estás seguro de que quieres eliminar este contacto? Esta acción no se puede deshacer."
+        onConfirm={handleDeleteContact}
       />
     </SidebarProvider>
   );

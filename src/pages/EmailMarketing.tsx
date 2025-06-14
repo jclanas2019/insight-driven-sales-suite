@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Mail, Send, Eye, MousePointer, TrendingUp, Users } from "lucide-react";
+import { Plus, Search, Mail, Send, Eye, MousePointer, TrendingUp, Users, Edit, Trash2 } from "lucide-react";
+import { AddCampaignDialog } from "@/components/AddCampaignDialog";
+import { EditCampaignDialog } from "@/components/EditCampaignDialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 // Mock data para campañas de email
-const mockCampaigns = [
+const initialCampaigns = [
   {
     id: 1,
     name: "Lanzamiento Producto Q2",
@@ -59,10 +61,14 @@ const mockCampaigns = [
 ];
 
 const EmailMarketing = () => {
+  const [campaigns, setCampaigns] = useState(initialCampaigns);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
 
-  const filteredCampaigns = mockCampaigns.filter(campaign =>
+  const filteredCampaigns = campaigns.filter(campaign =>
     campaign.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     campaign.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -75,6 +81,40 @@ const EmailMarketing = () => {
       case "Pausada": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const handleAddCampaign = (newCampaign: any) => {
+    const campaign = {
+      ...newCampaign,
+      id: campaigns.length + 1,
+      opens: 0,
+      clicks: 0
+    };
+    setCampaigns([...campaigns, campaign]);
+  };
+
+  const handleUpdateCampaign = (updatedCampaign: any) => {
+    setCampaigns(campaigns.map(campaign => 
+      campaign.id === updatedCampaign.id ? updatedCampaign : campaign
+    ));
+  };
+
+  const handleDeleteCampaign = () => {
+    if (selectedCampaign) {
+      setCampaigns(campaigns.filter(campaign => campaign.id !== selectedCampaign.id));
+      setSelectedCampaign(null);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  const openEditDialog = (campaign: any) => {
+    setSelectedCampaign(campaign);
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (campaign: any) => {
+    setSelectedCampaign(campaign);
+    setIsDeleteDialogOpen(true);
   };
 
   const totalRecipients = filteredCampaigns.reduce((sum, campaign) => sum + campaign.recipients, 0);
@@ -96,25 +136,10 @@ const EmailMarketing = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Email Marketing</h1>
               </div>
             </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nueva Campaña
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva Campaña</DialogTitle>
-                  <DialogDescription>
-                    Crea una nueva campaña de email marketing para tus contactos.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <p className="text-sm text-gray-600">Formulario de nueva campaña aquí...</p>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button onClick={() => setIsAddDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Nueva Campaña
+            </Button>
           </div>
 
           <div className="p-6 space-y-6">
@@ -191,6 +216,7 @@ const EmailMarketing = () => {
                       <TableHead>Clicks</TableHead>
                       <TableHead>Fecha Envío</TableHead>
                       <TableHead>CTR</TableHead>
+                      <TableHead>Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -233,6 +259,16 @@ const EmailMarketing = () => {
                               {clickRate}%
                             </div>
                           </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm" onClick={() => openEditDialog(campaign)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(campaign)}>
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -243,6 +279,27 @@ const EmailMarketing = () => {
           </div>
         </main>
       </div>
+
+      <AddCampaignDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onAddCampaign={handleAddCampaign}
+      />
+
+      <EditCampaignDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        campaign={selectedCampaign}
+        onUpdateCampaign={handleUpdateCampaign}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Eliminar Campaña"
+        description="¿Estás seguro de que quieres eliminar esta campaña? Esta acción no se puede deshacer."
+        onConfirm={handleDeleteCampaign}
+      />
     </SidebarProvider>
   );
 };

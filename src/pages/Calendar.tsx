@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Calendar as CalendarIcon, Clock, User, Phone, Video, MapPin } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Clock, User, Phone, Video, MapPin, Edit, Trash2 } from "lucide-react";
+import { AddEventDialog } from "@/components/AddEventDialog";
+import { EditEventDialog } from "@/components/EditEventDialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 // Mock data para eventos del calendario
-const mockEvents = [
+const initialEvents = [
   {
     id: 1,
     title: "Reunión con Tech Solutions",
@@ -58,8 +60,12 @@ const mockEvents = [
 ];
 
 const Calendar = () => {
+  const [events, setEvents] = useState(initialEvents);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -80,8 +86,40 @@ const Calendar = () => {
     }
   };
 
-  const todayEvents = mockEvents.filter(event => event.date === "2025-06-14");
-  const upcomingEvents = mockEvents.filter(event => new Date(event.date) > new Date("2025-06-14"));
+  const handleAddEvent = (newEvent: any) => {
+    const event = {
+      ...newEvent,
+      id: events.length + 1
+    };
+    setEvents([...events, event]);
+  };
+
+  const handleUpdateEvent = (updatedEvent: any) => {
+    setEvents(events.map(event => 
+      event.id === updatedEvent.id ? updatedEvent : event
+    ));
+  };
+
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      setEvents(events.filter(event => event.id !== selectedEvent.id));
+      setSelectedEvent(null);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  const openEditDialog = (event: any) => {
+    setSelectedEvent(event);
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (event: any) => {
+    setSelectedEvent(event);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const todayEvents = events.filter(event => event.date === "2025-06-14");
+  const upcomingEvents = events.filter(event => new Date(event.date) > new Date("2025-06-14"));
 
   return (
     <SidebarProvider>
@@ -96,25 +134,10 @@ const Calendar = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Calendario</h1>
               </div>
             </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nuevo Evento
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Programar Nuevo Evento</DialogTitle>
-                  <DialogDescription>
-                    Agenda una nueva reunión, llamada o actividad.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <p className="text-sm text-gray-600">Formulario de nuevo evento aquí...</p>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button onClick={() => setIsAddDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Evento
+            </Button>
           </div>
 
           <div className="p-6 space-y-6">
@@ -144,7 +167,7 @@ const Calendar = () => {
                   <User className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{mockEvents.length}</div>
+                  <div className="text-2xl font-bold">{events.length}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -154,7 +177,7 @@ const Calendar = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {mockEvents.filter(event => event.status === "Confirmada").length}
+                    {events.filter(event => event.status === "Confirmada").length}
                   </div>
                 </CardContent>
               </Card>
@@ -189,7 +212,7 @@ const Calendar = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {mockEvents.map((event) => (
+                    {events.map((event) => (
                       <div key={event.id} className="flex items-start space-x-4 p-4 border rounded-lg bg-white">
                         <div className="flex-shrink-0 mt-1">
                           {getTypeIcon(event.type)}
@@ -199,7 +222,15 @@ const Calendar = () => {
                             <h3 className="text-sm font-medium text-gray-900 truncate">
                               {event.title}
                             </h3>
-                            <Badge className={getStatusColor(event.status)}>{event.status}</Badge>
+                            <div className="flex items-center space-x-2">
+                              <Badge className={getStatusColor(event.status)}>{event.status}</Badge>
+                              <Button variant="ghost" size="sm" onClick={() => openEditDialog(event)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(event)}>
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
                             <div className="flex items-center">
@@ -233,6 +264,27 @@ const Calendar = () => {
           </div>
         </main>
       </div>
+
+      <AddEventDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onAddEvent={handleAddEvent}
+      />
+
+      <EditEventDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        event={selectedEvent}
+        onUpdateEvent={handleUpdateEvent}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Eliminar Evento"
+        description="¿Estás seguro de que quieres eliminar este evento? Esta acción no se puede deshacer."
+        onConfirm={handleDeleteEvent}
+      />
     </SidebarProvider>
   );
 };
