@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { FileText, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Quote {
@@ -17,9 +17,10 @@ interface Quote {
 
 interface SIIIntegrationProps {
   selectedQuote?: Quote | null;
+  onGenerateSale?: (quote: Quote) => void;
 }
 
-export const SIIIntegration = ({ selectedQuote }: SIIIntegrationProps) => {
+export const SIIIntegration = ({ selectedQuote, onGenerateSale }: SIIIntegrationProps) => {
   const { toast } = useToast();
 
   const handleSIIIntegration = () => {
@@ -31,6 +32,11 @@ export const SIIIntegration = ({ selectedQuote }: SIIIntegrationProps) => {
       title: "SII Integrado",
       description: "Datos preparados para facturación electrónica",
     });
+  };
+
+  const handleGenerateSale = () => {
+    if (!selectedQuote || !onGenerateSale) return;
+    onGenerateSale(selectedQuote);
   };
 
   return (
@@ -45,20 +51,27 @@ export const SIIIntegration = ({ selectedQuote }: SIIIntegrationProps) => {
         {selectedQuote?.status === "Aprobada" ? (
           <div className="space-y-4">
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <h4 className="font-medium text-green-800 mb-2">Lista para Facturación</h4>
+              <h4 className="font-medium text-green-800 mb-2">Lista para Proceso</h4>
               <p className="text-sm text-green-700">
-                Cotización {selectedQuote.number} aprobada y lista para generar factura electrónica
+                Cotización {selectedQuote.number} aprobada y lista para generar venta y factura electrónica
               </p>
             </div>
             
-            <Button onClick={handleSIIIntegration} className="w-full">
-              <FileText className="w-4 h-4 mr-2" />
-              Generar Factura Electrónica
-            </Button>
+            <div className="space-y-2">
+              <Button onClick={handleGenerateSale} className="w-full" variant="default">
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Generar Venta
+              </Button>
+              
+              <Button onClick={handleSIIIntegration} className="w-full" variant="outline">
+                <FileText className="w-4 h-4 mr-2" />
+                Preparar Facturación SII
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            Solo cotizaciones aprobadas pueden generar facturas
+            Solo cotizaciones aprobadas pueden generar ventas y facturas
           </div>
         )}
       </CardContent>

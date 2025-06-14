@@ -25,6 +25,7 @@ interface QuotesTabsProps {
   onRowClick: (quote: Quote) => void;
   onEditQuote: (quote: Quote) => void;
   onDeleteQuote: (quote: Quote) => void;
+  onGenerateSale?: (quote: Quote) => void;
 }
 
 export const QuotesTabs = ({
@@ -34,7 +35,8 @@ export const QuotesTabs = ({
   selectedQuote,
   onRowClick,
   onEditQuote,
-  onDeleteQuote
+  onDeleteQuote,
+  onGenerateSale
 }: QuotesTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
@@ -82,7 +84,7 @@ export const QuotesTabs = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <QuoteIntegrations selectedQuote={selectedQuote} />
+            <QuoteIntegrations selectedQuote={selectedQuote} onGenerateSale={onGenerateSale} />
           </CardContent>
         </Card>
       </TabsContent>

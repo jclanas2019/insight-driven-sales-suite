@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
@@ -11,8 +10,13 @@ import { MeetingRecorder } from "@/components/MeetingRecorder";
 import { ConversationAnalysis } from "@/components/ConversationAnalysis";
 import { SalesCoaching } from "@/components/SalesCoaching";
 import { SalesFeedback } from "@/components/SalesFeedback";
+import { GenerateSaleDialog } from "@/components/sales/GenerateSaleDialog";
+import { GenerateInvoiceDialog } from "@/components/invoicing/GenerateInvoiceDialog";
+import { SalesTable } from "@/components/sales/SalesTable";
+import { InvoicesTable } from "@/components/invoicing/InvoicesTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { Sale, Invoice } from "@/types/sales";
 
 interface Quote {
   id: number;
@@ -72,11 +76,16 @@ const initialQuotes: Quote[] = [
 const Quotes = () => {
   const { toast } = useToast();
   const [quotes, setQuotes] = useState<Quote[]>(initialQuotes);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
   const [deletingQuote, setDeletingQuote] = useState<Quote | null>(null);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [activeTab, setActiveTab] = useState("lista");
+  const [isGenerateSaleDialogOpen, setIsGenerateSaleDialogOpen] = useState(false);
+  const [isGenerateInvoiceDialogOpen, setIsGenerateInvoiceDialogOpen] = useState(false);
+  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
 
   const handleAddQuote = (newQuoteData: Omit<Quote, 'id'>) => {
     const newQuote: Quote = {
@@ -111,6 +120,51 @@ const Quotes = () => {
     }
   };
 
+  const handleGenerateSale = (quote: Quote) => {
+    setSelectedQuote(quote);
+    setIsGenerateSaleDialogOpen(true);
+  };
+
+  const handleSaleGenerated = (sale: Sale) => {
+    setSales([...sales, sale]);
+  };
+
+  const handleGenerateInvoice = (sale: Sale) => {
+    setSelectedSale(sale);
+    setIsGenerateInvoiceDialogOpen(true);
+  };
+
+  const handleInvoiceGenerated = (invoice: Invoice) => {
+    setInvoices([...invoices, invoice]);
+    
+    // Update sale status
+    setSales(sales.map(sale => 
+      sale.id === invoice.saleId 
+        ? { ...sale, status: "Facturada" as const, invoiceId: invoice.id }
+        : sale
+    ));
+  };
+
+  const handleUpdatePaymentStatus = (invoiceId: number, status: "Pendiente" | "Pagado" | "Vencido") => {
+    setInvoices(invoices.map(invoice => 
+      invoice.id === invoiceId 
+        ? { ...invoice, paymentStatus: status }
+        : invoice
+    ));
+
+    // Update sale status if paid
+    if (status === "Pagado") {
+      const invoice = invoices.find(inv => inv.id === invoiceId);
+      if (invoice) {
+        setSales(sales.map(sale => 
+          sale.id === invoice.saleId 
+            ? { ...sale, status: "Completada" as const }
+            : sale
+        ));
+      }
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -126,11 +180,13 @@ const Quotes = () => {
             <QuotesStats quotes={quotes} />
             
             <Tabs defaultValue="cotizaciones" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="cotizaciones">Cotizaciones</TabsTrigger>
-                <TabsTrigger value="reuniones">Grabación de Reuniones</TabsTrigger>
-                <TabsTrigger value="analisis">Análisis de Conversación</TabsTrigger>
-                <TabsTrigger value="coaching">Coaching de Vendedores</TabsTrigger>
+                <TabsTrigger value="ventas">Ventas</TabsTrigger>
+                <TabsTrigger value="facturas">Facturas</TabsTrigger>
+                <TabsTrigger value="reuniones">Grabación</TabsTrigger>
+                <TabsTrigger value="analisis">Análisis</TabsTrigger>
+                <TabsTrigger value="coaching">Coaching</TabsTrigger>
                 <TabsTrigger value="feedback">Retroalimentación</TabsTrigger>
               </TabsList>
               
@@ -143,6 +199,21 @@ const Quotes = () => {
                   onRowClick={handleRowClick}
                   onEditQuote={setEditingQuote}
                   onDeleteQuote={setDeletingQuote}
+                  onGenerateSale={handleGenerateSale}
+                />
+              </TabsContent>
+
+              <TabsContent value="ventas" className="mt-6">
+                <SalesTable 
+                  sales={sales}
+                  onGenerateInvoice={handleGenerateInvoice}
+                />
+              </TabsContent>
+
+              <TabsContent value="facturas" className="mt-6">
+                <InvoicesTable 
+                  invoices={invoices}
+                  onUpdatePaymentStatus={handleUpdatePaymentStatus}
                 />
               </TabsContent>
               
@@ -177,6 +248,20 @@ const Quotes = () => {
             title="Eliminar Cotización"
             description={`¿Está seguro que desea eliminar la cotización "${deletingQuote?.number}"? Esta acción no se puede deshacer.`}
             onConfirm={handleDeleteQuote}
+          />
+
+          <GenerateSaleDialog
+            open={isGenerateSaleDialogOpen}
+            onOpenChange={setIsGenerateSaleDialogOpen}
+            quote={selectedQuote}
+            onSaleGenerated={handleSaleGenerated}
+          />
+
+          <GenerateInvoiceDialog
+            open={isGenerateInvoiceDialogOpen}
+            onOpenChange={setIsGenerateInvoiceDialogOpen}
+            sale={selectedSale}
+            onInvoiceGenerated={handleInvoiceGenerated}
           />
         </main>
       </div>

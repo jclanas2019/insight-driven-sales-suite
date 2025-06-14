@@ -21,9 +21,10 @@ interface Quote {
 
 interface QuoteIntegrationsProps {
   selectedQuote?: Quote | null;
+  onGenerateSale?: (quote: Quote) => void;
 }
 
-export const QuoteIntegrations = ({ selectedQuote }: QuoteIntegrationsProps) => {
+export const QuoteIntegrations = ({ selectedQuote, onGenerateSale }: QuoteIntegrationsProps) => {
   const [integrationStatus] = useState({
     whatsapp: false,
     sii: false,
@@ -74,7 +75,7 @@ export const QuoteIntegrations = ({ selectedQuote }: QuoteIntegrationsProps) => 
         </TabsContent>
 
         <TabsContent value="sii" className="space-y-4">
-          <SIIIntegration selectedQuote={selectedQuote} />
+          <SIIIntegration selectedQuote={selectedQuote} onGenerateSale={onGenerateSale} />
         </TabsContent>
 
         <TabsContent value="ads" className="space-y-4">
