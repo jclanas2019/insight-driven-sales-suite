@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,10 @@ interface QuoteIntegrationsProps {
   selectedQuote?: Quote | null;
 }
 
+const formatCLP = (amount: number) => {
+  return `$${amount.toLocaleString('es-CL')} CLP`;
+};
+
 export const QuoteIntegrations = ({ selectedQuote }: QuoteIntegrationsProps) => {
   const { toast } = useToast();
   const [whatsappMessage, setWhatsappMessage] = useState("");
@@ -37,7 +40,7 @@ export const QuoteIntegrations = ({ selectedQuote }: QuoteIntegrationsProps) => 
 
   // Plantillas predefinidas para Chile
   const whatsappTemplates = {
-    seguimiento: `Hola! Te escribo de [EMPRESA] para hacer seguimiento de la cotización ${selectedQuote?.number} por $${selectedQuote?.amount?.toLocaleString()}.
+    seguimiento: `Hola! Te escribo de [EMPRESA] para hacer seguimiento de la cotización ${selectedQuote?.number} por ${selectedQuote?.amount ? formatCLP(selectedQuote.amount) : ''}.
 
 ¿Tienes alguna consulta? ¿Necesitas ajustes en la propuesta?
 
@@ -173,7 +176,7 @@ Te contactaremos pronto para coordinar detalles.`
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <h4 className="font-medium mb-2">Cotización Seleccionada:</h4>
                     <p className="text-sm">{selectedQuote.number} - {selectedQuote.client}</p>
-                    <p className="text-sm text-gray-600">Monto: ${selectedQuote.amount.toLocaleString()}</p>
+                    <p className="text-sm text-gray-600">Monto: {formatCLP(selectedQuote.amount)}</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

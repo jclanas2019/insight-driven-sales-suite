@@ -25,6 +25,10 @@ interface QuotesTableProps {
   onDeleteQuote: (quote: Quote) => void;
 }
 
+const formatCLP = (amount: number) => {
+  return `$${amount.toLocaleString('es-CL')} CLP`;
+};
+
 export const QuotesTable = ({ quotes, onRowClick, onEditQuote, onDeleteQuote }: QuotesTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -89,7 +93,7 @@ export const QuotesTable = ({ quotes, onRowClick, onEditQuote, onDeleteQuote }: 
                 <TableCell className="font-medium">{quote.number}</TableCell>
                 <TableCell>{quote.client}</TableCell>
                 <TableCell>{quote.title}</TableCell>
-                <TableCell>${quote.amount.toLocaleString()}</TableCell>
+                <TableCell>{formatCLP(quote.amount)}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(quote.status)}>{quote.status}</Badge>
                 </TableCell>

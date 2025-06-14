@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +32,10 @@ interface AIInsight {
   impact?: string;
 }
 
+const formatCLP = (amount: number) => {
+  return `$${amount.toLocaleString('es-CL')} CLP`;
+};
+
 export const QuoteAIInsights = ({ quotes, selectedQuote }: QuoteAIInsightsProps) => {
   const [activeTab, setActiveTab] = useState("predicciones");
 
@@ -62,10 +65,10 @@ export const QuoteAIInsights = ({ quotes, selectedQuote }: QuoteAIInsightsProps)
     {
       type: "prediccion",
       title: "Proyección de Ingresos",
-      description: "Las cotizaciones actuales proyectan €156,000 en ingresos para este trimestre",
+      description: "Las cotizaciones actuales proyectan $88.400.000 CLP en ingresos para este trimestre",
       confidence: 87,
       priority: "Alta",
-      impact: "€156,000"
+      impact: "$88.400.000 CLP"
     },
     {
       type: "riesgo",
@@ -152,7 +155,7 @@ export const QuoteAIInsights = ({ quotes, selectedQuote }: QuoteAIInsightsProps)
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${Math.round(totalValue * 0.67).toLocaleString()}</div>
+            <div className="text-2xl font-bold">{formatCLP(Math.round(totalValue * 0.67))}</div>
             <p className="text-xs text-muted-foreground">
               Basado en IA
             </p>
@@ -258,7 +261,7 @@ export const QuoteAIInsights = ({ quotes, selectedQuote }: QuoteAIInsightsProps)
                               </p>
                             </div>
                           )}
-                          {selectedQuote.amount > 30000 && (
+                          {selectedQuote.amount > 15000000 && (
                             <div className="p-3 bg-green-50 border border-green-200 rounded">
                               <p className="text-sm text-green-800">
                                 💎 Alto valor comercial. Programar reunión personalizada.

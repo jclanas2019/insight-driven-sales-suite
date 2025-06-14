@@ -17,6 +17,10 @@ interface QuotesStatsProps {
   quotes: Quote[];
 }
 
+const formatCLP = (amount: number) => {
+  return `$${amount.toLocaleString('es-CL')} CLP`;
+};
+
 export const QuotesStats = ({ quotes }: QuotesStatsProps) => {
   const totalAmount = quotes.reduce((sum, quote) => sum + quote.amount, 0);
   const approvedQuotes = quotes.filter(quote => quote.status === "Aprobada").length;
@@ -39,7 +43,7 @@ export const QuotesStats = ({ quotes }: QuotesStatsProps) => {
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">${totalAmount.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{formatCLP(totalAmount)}</div>
         </CardContent>
       </Card>
       <Card>

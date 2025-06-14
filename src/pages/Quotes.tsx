@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
@@ -20,14 +19,14 @@ interface Quote {
   createdDate: string;
 }
 
-// Mock data for quotes
+// Mock data for quotes with Chilean peso amounts
 const initialQuotes: Quote[] = [
   {
     id: 1,
     number: "COT-2025-001",
     client: "Tech Solutions S.A.",
     title: "Licencias Software Empresarial",
-    amount: 45000,
+    amount: 25500000,
     status: "Enviada",
     validUntil: "2025-07-15",
     createdDate: "2025-06-10"
@@ -37,7 +36,7 @@ const initialQuotes: Quote[] = [
     number: "COT-2025-002",
     client: "Marketing Plus Ltda.",
     title: "Servicios de Consultoría",
-    amount: 12500,
+    amount: 8750000,
     status: "Aprobada",
     validUntil: "2025-06-25",
     createdDate: "2025-06-05"
@@ -47,7 +46,7 @@ const initialQuotes: Quote[] = [
     number: "COT-2025-003",
     client: "Innovate Corp",
     title: "Implementación Sistema CRM",
-    amount: 32000,
+    amount: 18200000,
     status: "Borrador",
     validUntil: "2025-08-01",
     createdDate: "2025-06-12"
@@ -57,7 +56,7 @@ const initialQuotes: Quote[] = [
     number: "COT-2025-004",
     client: "Global Industries",
     title: "Mantenimiento Anual",
-    amount: 8500,
+    amount: 4850000,
     status: "Vencida",
     validUntil: "2025-06-01",
     createdDate: "2025-05-15"

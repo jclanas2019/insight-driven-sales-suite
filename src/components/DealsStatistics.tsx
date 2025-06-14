@@ -17,6 +17,10 @@ interface DealsStatisticsProps {
   deals: Deal[];
 }
 
+const formatCLP = (amount: number) => {
+  return `$${amount.toLocaleString('es-CL')} CLP`;
+};
+
 export const DealsStatistics = ({ deals }: DealsStatisticsProps) => {
   const totalValue = deals.reduce((sum, deal) => sum + deal.value, 0);
   const avgProbability = deals.reduce((sum, deal) => sum + deal.probability, 0) / deals.length;
@@ -39,7 +43,7 @@ export const DealsStatistics = ({ deals }: DealsStatisticsProps) => {
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">${totalValue.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{formatCLP(totalValue)}</div>
         </CardContent>
       </Card>
       <Card>
