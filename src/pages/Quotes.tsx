@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, FileText, DollarSign, Calendar, Download, Edit, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, FileText, DollarSign, Calendar, Download, Edit, Trash2, Brain, MessageSquare } from "lucide-react";
 import { AddQuoteDialog } from "@/components/AddQuoteDialog";
 import { EditQuoteDialog } from "@/components/EditQuoteDialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { QuoteAIInsights } from "@/components/QuoteAIInsights";
+import { QuoteIntegrations } from "@/components/QuoteIntegrations";
 import { useToast } from "@/hooks/use-toast";
 
 interface Quote {
@@ -75,6 +78,8 @@ const Quotes = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
   const [deletingQuote, setDeletingQuote] = useState<Quote | null>(null);
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  const [activeTab, setActiveTab] = useState("lista");
 
   const filteredQuotes = quotes.filter(quote =>
     quote.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -108,6 +113,13 @@ const Quotes = () => {
     }
   };
 
+  const handleRowClick = (quote: Quote) => {
+    setSelectedQuote(quote);
+    if (activeTab === "lista") {
+      setActiveTab("ia-insights");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Borrador": return "bg-gray-100 text-gray-800";
@@ -133,7 +145,7 @@ const Quotes = () => {
               <SidebarTrigger className="mr-4" />
               <div className="flex items-center space-x-2">
                 <FileText className="w-6 h-6 text-blue-600" />
-                <h1 className="text-xl font-semibold text-slate-900">Cotizaciones</h1>
+                <h1 className="text-xl font-semibold text-slate-900">Cotizaciones Inteligentes</h1>
               </div>
             </div>
             <AddQuoteDialog 
@@ -184,80 +196,128 @@ const Quotes = () => {
               </Card>
             </div>
 
-            {/* Search and Quotes Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Lista de Cotizaciones</CardTitle>
-                <CardDescription>
-                  Gestiona y da seguimiento a todas tus cotizaciones
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 mb-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar cotizaciones..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8"
-                    />
-                  </div>
-                </div>
+            {/* Tabs para diferentes vistas */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="lista">Lista de Cotizaciones</TabsTrigger>
+                <TabsTrigger value="ia-insights">IA & Predicciones</TabsTrigger>
+                <TabsTrigger value="integraciones">Integraciones</TabsTrigger>
+              </TabsList>
 
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Número</TableHead>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>Título</TableHead>
-                      <TableHead>Monto</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Válida Hasta</TableHead>
-                      <TableHead>Fecha Creación</TableHead>
-                      <TableHead>Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredQuotes.map((quote) => (
-                      <TableRow key={quote.id}>
-                        <TableCell className="font-medium">{quote.number}</TableCell>
-                        <TableCell>{quote.client}</TableCell>
-                        <TableCell>{quote.title}</TableCell>
-                        <TableCell>${quote.amount.toLocaleString()}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(quote.status)}>{quote.status}</Badge>
-                        </TableCell>
-                        <TableCell>{quote.validUntil}</TableCell>
-                        <TableCell>{quote.createdDate}</TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
-                              <Download className="w-4 h-4 mr-1" />
-                              PDF
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setEditingQuote(quote)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setDeletingQuote(quote)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+              <TabsContent value="lista" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Lista de Cotizaciones</CardTitle>
+                    <CardDescription>
+                      Gestiona y da seguimiento a todas tus cotizaciones. Haz clic en una fila para ver análisis IA.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center space-x-2 mb-4">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Buscar cotizaciones..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-8"
+                        />
+                      </div>
+                    </div>
+
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Número</TableHead>
+                          <TableHead>Cliente</TableHead>
+                          <TableHead>Título</TableHead>
+                          <TableHead>Monto</TableHead>
+                          <TableHead>Estado</TableHead>
+                          <TableHead>Válida Hasta</TableHead>
+                          <TableHead>Fecha Creación</TableHead>
+                          <TableHead>Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredQuotes.map((quote) => (
+                          <TableRow 
+                            key={quote.id} 
+                            className="cursor-pointer hover:bg-gray-50"
+                            onClick={() => handleRowClick(quote)}
+                          >
+                            <TableCell className="font-medium">{quote.number}</TableCell>
+                            <TableCell>{quote.client}</TableCell>
+                            <TableCell>{quote.title}</TableCell>
+                            <TableCell>${quote.amount.toLocaleString()}</TableCell>
+                            <TableCell>
+                              <Badge className={getStatusColor(quote.status)}>{quote.status}</Badge>
+                            </TableCell>
+                            <TableCell>{quote.validUntil}</TableCell>
+                            <TableCell>{quote.createdDate}</TableCell>
+                            <TableCell onClick={(e) => e.stopPropagation()}>
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm">
+                                  <Download className="w-4 h-4 mr-1" />
+                                  PDF
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setEditingQuote(quote)}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setDeletingQuote(quote)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="ia-insights" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Brain className="w-5 h-5 text-purple-600" />
+                      <span>Inteligencia Artificial para Ventas</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Predicciones, análisis de riesgo y recomendaciones basadas en IA
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <QuoteAIInsights quotes={quotes} selectedQuote={selectedQuote} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="integraciones" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <MessageSquare className="w-5 h-5 text-green-600" />
+                      <span>Integraciones Nativas</span>
+                    </CardTitle>
+                    <CardDescription>
+                      WhatsApp Business, SII, Google Ads y plataformas chilenas
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <QuoteIntegrations selectedQuote={selectedQuote} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Edit Quote Dialog */}
