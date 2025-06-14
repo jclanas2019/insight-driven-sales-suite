@@ -5,8 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Send, Users, Clock, Plus } from "lucide-react";
+import { NewTeamMessageDialog } from "@/components/dialogs/NewTeamMessageDialog";
 
 const TeamMessages = () => {
+  const handleMessageSent = () => {
+    // Aquí se podría actualizar la lista de mensajes
+    console.log("Nuevo mensaje de equipo enviado");
+  };
+
+  const handleOpenMessage = (subject: string) => {
+    // Aquí se implementaría la lógica para abrir el mensaje
+    console.log(`Abriendo mensaje: ${subject}`);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -20,10 +31,7 @@ const TeamMessages = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Mensajes de mi equipo</h1>
               </div>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Mensaje
-            </Button>
+            <NewTeamMessageDialog onMessageSent={handleMessageSent} />
           </div>
 
           <div className="p-6 space-y-6">
@@ -142,7 +150,11 @@ const TeamMessages = () => {
                           <p className="text-sm text-slate-600">{message.preview}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleOpenMessage(message.subject)}
+                          >
                             Abrir
                           </Button>
                         </div>

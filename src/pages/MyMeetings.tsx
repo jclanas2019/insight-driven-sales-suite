@@ -5,8 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Video, Calendar, Clock, Users, Plus } from "lucide-react";
+import { NewPersonalMeetingDialog } from "@/components/dialogs/NewPersonalMeetingDialog";
 
 const MyMeetings = () => {
+  const handleMeetingCreated = () => {
+    // Aquí se podría actualizar la lista de reuniones
+    console.log("Nueva reunión personal creada");
+  };
+
+  const handleJoinMeeting = (meetingTitle: string, platform: string) => {
+    // Aquí se implementaría la lógica para unirse a la reunión según la plataforma
+    console.log(`Uniéndose a ${meetingTitle} en ${platform}`);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -20,10 +31,7 @@ const MyMeetings = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Mis reuniones</h1>
               </div>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Programar Reunión
-            </Button>
+            <NewPersonalMeetingDialog onMeetingCreated={handleMeetingCreated} />
           </div>
 
           <div className="p-6 space-y-6">
@@ -143,8 +151,13 @@ const MyMeetings = () => {
                           <Badge variant={meeting.status === "Confirmada" ? "default" : "secondary"}>
                             {meeting.status}
                           </Badge>
-                          <Button variant="outline" size="sm">
-                            Unirse
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleJoinMeeting(meeting.title, meeting.platform)}
+                            disabled={meeting.platform === "Presencial"}
+                          >
+                            {meeting.platform === "Presencial" ? "Ver detalles" : "Unirse"}
                           </Button>
                         </div>
                       </div>

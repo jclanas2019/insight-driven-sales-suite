@@ -6,8 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Archive, Search, Calendar, File, MessageSquare, Video, Trash2, RotateCcw } from "lucide-react";
+import { RestoreArchivedDialog } from "@/components/dialogs/RestoreArchivedDialog";
+import { DeleteArchivedDialog } from "@/components/dialogs/DeleteArchivedDialog";
 
 const Archived = () => {
+  const handleRestore = (itemTitle: string) => {
+    // Aquí se implementaría la lógica para restaurar el elemento
+    console.log(`Restaurando: ${itemTitle}`);
+  };
+
+  const handleDelete = (itemTitle: string) => {
+    // Aquí se implementaría la lógica para eliminar permanentemente
+    console.log(`Eliminando permanentemente: ${itemTitle}`);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -152,14 +164,16 @@ const Archived = () => {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <RotateCcw className="w-4 h-4 mr-1" />
-                            Restaurar
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Eliminar
-                          </Button>
+                          <RestoreArchivedDialog
+                            itemTitle={item.title}
+                            itemType={item.type === "meeting" ? "reunión" : item.type === "message" ? "mensaje" : "documento"}
+                            onRestore={() => handleRestore(item.title)}
+                          />
+                          <DeleteArchivedDialog
+                            itemTitle={item.title}
+                            itemType={item.type === "meeting" ? "reunión" : item.type === "message" ? "mensaje" : "documento"}
+                            onDelete={() => handleDelete(item.title)}
+                          />
                         </div>
                       </div>
                     </div>

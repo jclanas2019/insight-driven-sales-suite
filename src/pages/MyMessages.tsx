@@ -5,8 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Mail, Phone, Clock, Plus } from "lucide-react";
+import { NewPersonalMessageDialog } from "@/components/dialogs/NewPersonalMessageDialog";
 
 const MyMessages = () => {
+  const handleMessageSent = () => {
+    // Aquí se podría actualizar la lista de mensajes
+    console.log("Nuevo mensaje personal enviado");
+  };
+
+  const handleReplyMessage = (sender: string, subject: string) => {
+    // Aquí se implementaría la lógica para responder al mensaje
+    console.log(`Respondiendo a ${sender} sobre: ${subject}`);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -20,10 +31,7 @@ const MyMessages = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Mis mensajes</h1>
               </div>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Mensaje
-            </Button>
+            <NewPersonalMessageDialog onMessageSent={handleMessageSent} />
           </div>
 
           <div className="p-6 space-y-6">
@@ -167,7 +175,11 @@ const MyMessages = () => {
                           <p className="text-sm text-slate-600">{message.preview}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleReplyMessage(message.from, message.subject)}
+                          >
                             Responder
                           </Button>
                         </div>

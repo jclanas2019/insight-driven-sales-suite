@@ -5,8 +5,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Calendar, Clock, Video, Plus } from "lucide-react";
+import { NewTeamMeetingDialog } from "@/components/dialogs/NewTeamMeetingDialog";
 
 const TeamMeetings = () => {
+  const handleMeetingCreated = () => {
+    // Aquí se podría actualizar la lista de reuniones
+    console.log("Nueva reunión de equipo creada");
+  };
+
+  const handleJoinMeeting = (meetingTitle: string) => {
+    // Aquí se implementaría la lógica para unirse a la reunión
+    console.log(`Uniéndose a la reunión: ${meetingTitle}`);
+  };
+
+  const handleViewDetails = (meetingTitle: string) => {
+    // Aquí se implementaría la lógica para ver detalles de la reunión
+    console.log(`Viendo detalles de: ${meetingTitle}`);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -20,10 +36,7 @@ const TeamMeetings = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Reuniones de mi equipo</h1>
               </div>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Nueva Reunión de Equipo
-            </Button>
+            <NewTeamMeetingDialog onMeetingCreated={handleMeetingCreated} />
           </div>
 
           <div className="p-6 space-y-6">
@@ -123,9 +136,22 @@ const TeamMeetings = () => {
                           <Badge variant={meeting.status === "Confirmada" ? "default" : "secondary"}>
                             {meeting.status}
                           </Badge>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewDetails(meeting.title)}
+                          >
                             Ver Detalles
                           </Button>
+                          {meeting.type === "Virtual" && (
+                            <Button 
+                              size="sm" 
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => handleJoinMeeting(meeting.title)}
+                            >
+                              Unirse
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
