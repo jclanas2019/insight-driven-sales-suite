@@ -7,11 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, FileText, DollarSign, Calendar, Download } from "lucide-react";
+import { Search, FileText, DollarSign, Calendar, Download, Edit, Trash2 } from "lucide-react";
+import { AddQuoteDialog } from "@/components/AddQuoteDialog";
+import { EditQuoteDialog } from "@/components/EditQuoteDialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { useToast } from "@/hooks/use-toast";
+
+interface Quote {
+  id: number;
+  number: string;
+  client: string;
+  title: string;
+  amount: number;
+  status: string;
+  validUntil: string;
+  createdDate: string;
+}
 
 // Mock data for quotes
-const mockQuotes = [
+const initialQuotes: Quote[] = [
   {
     id: 1,
     number: "COT-2025-001",
@@ -55,14 +69,44 @@ const mockQuotes = [
 ];
 
 const Quotes = () => {
+  const { toast } = useToast();
+  const [quotes, setQuotes] = useState<Quote[]>(initialQuotes);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
+  const [deletingQuote, setDeletingQuote] = useState<Quote | null>(null);
 
-  const filteredQuotes = mockQuotes.filter(quote =>
+  const filteredQuotes = quotes.filter(quote =>
     quote.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
     quote.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
     quote.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAddQuote = (newQuoteData: Omit<Quote, 'id'>) => {
+    const newQuote: Quote = {
+      id: Math.max(...quotes.map(q => q.id), 0) + 1,
+      ...newQuoteData,
+    };
+    setQuotes([...quotes, newQuote]);
+  };
+
+  const handleUpdateQuote = (updatedQuote: Quote) => {
+    setQuotes(quotes.map(quote => 
+      quote.id === updatedQuote.id ? updatedQuote : quote
+    ));
+    setEditingQuote(null);
+  };
+
+  const handleDeleteQuote = () => {
+    if (deletingQuote) {
+      setQuotes(quotes.filter(quote => quote.id !== deletingQuote.id));
+      setDeletingQuote(null);
+      toast({
+        title: "Cotización eliminada",
+        description: "La cotización se ha eliminado exitosamente.",
+      });
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -92,25 +136,11 @@ const Quotes = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Cotizaciones</h1>
               </div>
             </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nueva Cotización
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva Cotización</DialogTitle>
-                  <DialogDescription>
-                    Genera una nueva cotización para un cliente.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <p className="text-sm text-gray-600">Formulario de nueva cotización aquí...</p>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <AddQuoteDialog 
+              open={isAddDialogOpen} 
+              onOpenChange={setIsAddDialogOpen}
+              onAdd={handleAddQuote}
+            />
           </div>
 
           <div className="p-6 space-y-6">
@@ -201,10 +231,26 @@ const Quotes = () => {
                         <TableCell>{quote.validUntil}</TableCell>
                         <TableCell>{quote.createdDate}</TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm">
-                            <Download className="w-4 h-4 mr-1" />
-                            PDF
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">
+                              <Download className="w-4 h-4 mr-1" />
+                              PDF
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setEditingQuote(quote)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setDeletingQuote(quote)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -213,6 +259,23 @@ const Quotes = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Edit Quote Dialog */}
+          <EditQuoteDialog
+            open={!!editingQuote}
+            onOpenChange={() => setEditingQuote(null)}
+            quote={editingQuote}
+            onUpdate={handleUpdateQuote}
+          />
+
+          {/* Delete Confirmation Dialog */}
+          <DeleteConfirmDialog
+            open={!!deletingQuote}
+            onOpenChange={() => setDeletingQuote(null)}
+            title="Eliminar Cotización"
+            description={`¿Está seguro que desea eliminar la cotización "${deletingQuote?.number}"? Esta acción no se puede deshacer.`}
+            onConfirm={handleDeleteQuote}
+          />
         </main>
       </div>
     </SidebarProvider>
