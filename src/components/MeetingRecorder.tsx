@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, MicOff, Play, Pause, Square, FileText, Download, Users, Calendar, TrendingUp, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PostMeetingFeedback } from "@/components/PostMeetingFeedback";
 
 interface Recording {
   id: number;
@@ -260,6 +260,13 @@ export const MeetingRecorder = () => {
                     </Badge>
                     {recording.status === "completed" && (
                       <div className="flex space-x-2">
+                        <PostMeetingFeedback 
+                          meetingData={{
+                            title: recording.title,
+                            duration: recording.duration,
+                            participant: recording.participants.join(", ")
+                          }}
+                        />
                         <Button 
                           variant="outline" 
                           size="sm"

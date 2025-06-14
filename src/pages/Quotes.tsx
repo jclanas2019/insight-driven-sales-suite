@@ -10,6 +10,7 @@ import { QuotesTabs } from "@/components/QuotesTabs";
 import { MeetingRecorder } from "@/components/MeetingRecorder";
 import { ConversationAnalysis } from "@/components/ConversationAnalysis";
 import { SalesCoaching } from "@/components/SalesCoaching";
+import { SalesFeedback } from "@/components/SalesFeedback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
@@ -125,11 +126,12 @@ const Quotes = () => {
             <QuotesStats quotes={quotes} />
             
             <Tabs defaultValue="cotizaciones" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="cotizaciones">Cotizaciones</TabsTrigger>
                 <TabsTrigger value="reuniones">Grabación de Reuniones</TabsTrigger>
                 <TabsTrigger value="analisis">Análisis de Conversación</TabsTrigger>
                 <TabsTrigger value="coaching">Coaching de Vendedores</TabsTrigger>
+                <TabsTrigger value="feedback">Retroalimentación</TabsTrigger>
               </TabsList>
               
               <TabsContent value="cotizaciones" className="mt-6">
@@ -154,6 +156,10 @@ const Quotes = () => {
               
               <TabsContent value="coaching" className="mt-6">
                 <SalesCoaching />
+              </TabsContent>
+              
+              <TabsContent value="feedback" className="mt-6">
+                <SalesFeedback />
               </TabsContent>
             </Tabs>
           </div>
