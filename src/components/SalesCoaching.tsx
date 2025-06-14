@@ -1,36 +1,8 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Users, Target, BookOpen, Award, Calendar, Play } from "lucide-react";
-
-interface CoachingModule {
-  id: number;
-  title: string;
-  description: string;
-  progress: number;
-  estimatedTime: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  completed: boolean;
-}
-
-interface PerformanceMetric {
-  label: string;
-  current: number;
-  target: number;
-  improvement: number;
-}
-
-interface CoachingSession {
-  id: number;
-  title: string;
-  date: string;
-  duration: string;
-  coach: string;
-  status: "completed" | "scheduled" | "cancelled";
-  score?: number;
-}
+import { PerformanceOverview } from "@/components/coaching/PerformanceOverview";
+import { CoachingModules } from "@/components/coaching/CoachingModules";
+import { CoachingSessions } from "@/components/coaching/CoachingSessions";
+import type { CoachingModule, PerformanceMetric, CoachingSession } from "@/types/coaching";
 
 export const SalesCoaching = () => {
   const modules: CoachingModule[] = [
@@ -122,165 +94,11 @@ export const SalesCoaching = () => {
     }
   ];
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner": return "bg-green-100 text-green-800";
-      case "intermediate": return "bg-yellow-100 text-yellow-800";
-      case "advanced": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed": return "bg-green-100 text-green-800";
-      case "scheduled": return "bg-blue-100 text-blue-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const formatCLP = (amount: number) => {
-    return `$${amount.toLocaleString('es-CL')}`;
-  };
-
   return (
     <div className="space-y-6">
-      {/* Performance Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Target className="w-5 h-5" />
-            <span>Rendimiento de Ventas</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {performanceMetrics.map((metric, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{metric.label}</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm">
-                      {metric.label.includes("Valor") 
-                        ? formatCLP(metric.current)
-                        : `${metric.current}${metric.label.includes("Tasa") ? "%" : " días"}`
-                      }
-                    </span>
-                    <Badge className={metric.improvement > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                      {metric.improvement > 0 ? "+" : ""}{metric.improvement}%
-                    </Badge>
-                  </div>
-                </div>
-                <Progress 
-                  value={metric.label.includes("Tiempo") ? 100 - (metric.current / metric.target * 100) : (metric.current / metric.target * 100)} 
-                  className="h-2" 
-                />
-                <p className="text-xs text-gray-500">
-                  Meta: {metric.label.includes("Valor") 
-                    ? formatCLP(metric.target)
-                    : `${metric.target}${metric.label.includes("Tasa") ? "%" : " días"}`
-                  }
-                </p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Coaching Modules */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <BookOpen className="w-5 h-5" />
-            <span>Módulos de Entrenamiento</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {modules.map((module) => (
-              <div key={module.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-medium">{module.title}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{module.description}</p>
-                  </div>
-                  {module.completed && <Award className="w-5 h-5 text-green-600" />}
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Badge className={getDifficultyColor(module.difficulty)}>
-                    {module.difficulty === "beginner" && "Principiante"}
-                    {module.difficulty === "intermediate" && "Intermedio"}
-                    {module.difficulty === "advanced" && "Avanzado"}
-                  </Badge>
-                  <span className="text-xs text-gray-500">{module.estimatedTime}</span>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Progreso</span>
-                    <span className="text-sm font-medium">{module.progress}%</span>
-                  </div>
-                  <Progress value={module.progress} className="h-2" />
-                </div>
-                
-                <Button 
-                  className="w-full" 
-                  variant={module.completed ? "outline" : "default"}
-                  size="sm"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  {module.completed ? "Revisar" : module.progress > 0 ? "Continuar" : "Comenzar"}
-                </Button>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Coaching Sessions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Users className="w-5 h-5" />
-            <span>Sesiones de Coaching</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {coachingSessions.map((session) => (
-              <div key={session.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-medium">{session.title}</h3>
-                    <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{session.date}</span>
-                      </div>
-                      <span>{session.duration}</span>
-                      <span>Coach: {session.coach}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {session.score && (
-                      <Badge className="bg-blue-100 text-blue-800">
-                        {session.score}/10
-                      </Badge>
-                    )}
-                    <Badge className={getStatusColor(session.status)}>
-                      {session.status === "completed" && "Completada"}
-                      {session.status === "scheduled" && "Programada"}
-                      {session.status === "cancelled" && "Cancelada"}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <PerformanceOverview metrics={performanceMetrics} />
+      <CoachingModules modules={modules} />
+      <CoachingSessions sessions={coachingSessions} />
     </div>
   );
 };
