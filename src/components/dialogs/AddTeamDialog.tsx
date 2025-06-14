@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Users } from "lucide-react";
+import { Plus, UserPlus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddTeamDialogProps {
@@ -14,25 +14,23 @@ interface AddTeamDialogProps {
 
 export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: ""
-  });
+  const [emailInput, setEmailInput] = useState("");
+  const [emails, setEmails] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email) {
-      toast({
-        title: "Error",
-        description: "Por favor completa todos los campos obligatorios",
-        variant: "destructive"
-      });
-      return;
+  const handleEmailKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addEmail();
     }
+  };
 
-    if (!formData.email.includes("@")) {
+  const addEmail = () => {
+    const trimmedEmail = emailInput.trim();
+    
+    if (!trimmedEmail) return;
+    
+    if (!trimmedEmail.includes("@")) {
       toast({
         title: "Error",
         description: "Por favor ingresa un email válido",
@@ -41,16 +39,43 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
       return;
     }
 
+    if (emails.includes(trimmedEmail)) {
+      toast({
+        title: "Error",
+        description: "Este email ya ha sido agregado",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setEmails(prev => [...prev, trimmedEmail]);
+    setEmailInput("");
+  };
+
+  const removeEmail = (emailToRemove: string) => {
+    setEmails(prev => prev.filter(email => email !== emailToRemove));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (emails.length === 0) {
+      toast({
+        title: "Error",
+        description: "Por favor agrega al menos un correo electrónico",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
-      title: "Equipo agregado",
-      description: `El equipo "${formData.name}" ha sido creado exitosamente`,
+      title: "Invitaciones enviadas",
+      description: `Se han enviado ${emails.length} invitaciones exitosamente`,
     });
 
     setOpen(false);
-    setFormData({
-      name: "",
-      email: ""
-    });
+    setEmails([]);
+    setEmailInput("");
     onTeamAdded?.();
   };
 
@@ -60,51 +85,63 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
         {trigger || (
           <Button className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
-            Agregar Equipo
+            Invita a tu equipo
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <Users className="w-5 h-5 text-blue-600" />
-            <span>Agregar Nuevo Equipo</span>
+            <UserPlus className="w-5 h-5 text-blue-600" />
+            <span>Invita a tu equipo</span>
           </DialogTitle>
           <DialogDescription>
-            Crea un nuevo equipo para organizar tu trabajo
+            Ingresa el correo de los ejecutivos a quienes quieras invitar a usar diio. Presiona [Enter] para agregar cada correo
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="team-name">Nombre del Equipo *</Label>
+            <Label htmlFor="email-input">Correos electrónicos</Label>
             <Input
-              id="team-name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Ej: Equipo de Ventas Norte"
-              required
+              id="email-input"
+              type="email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              onKeyPress={handleEmailKeyPress}
+              placeholder="Ej: ejecutivo@empresa.com"
             />
+            <p className="text-xs text-slate-500">Presiona Enter para agregar cada correo</p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="team-email">Email del Equipo *</Label>
-            <Input
-              id="team-email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              placeholder="Ej: ventas-norte@empresa.com"
-              required
-            />
-          </div>
+          {emails.length > 0 && (
+            <div className="space-y-2">
+              <Label>Correos agregados ({emails.length})</Label>
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                {emails.map((email, index) => (
+                  <div key={index} className="flex items-center justify-between bg-slate-50 rounded px-2 py-1 text-sm">
+                    <span>{email}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeEmail(email)}
+                      className="h-6 w-6 p-0 hover:bg-slate-200"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              <Users className="w-4 h-4 mr-2" />
-              Crear Equipo
+              <UserPlus className="w-4 h-4 mr-2" />
+              Enviar Invitaciones ({emails.length})
             </Button>
           </DialogFooter>
         </form>
