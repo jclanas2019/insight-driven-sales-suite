@@ -28,6 +28,9 @@ import {
   Calendar,
   FileText,
   Settings,
+  MessageSquare,
+  Video,
+  Archive,
 } from "lucide-react";
 
 const menuItems = [
@@ -100,6 +103,41 @@ const crmSections = [
         url: "/calendar",
         icon: Calendar,
         description: "Agenda y programación"
+      }
+    ]
+  },
+  {
+    title: "Colaboración",
+    items: [
+      {
+        title: "Reuniones de mi equipo",
+        url: "/team-meetings",
+        icon: Users,
+        description: "Reuniones del equipo"
+      },
+      {
+        title: "Mensajes de mi equipo",
+        url: "/team-messages",
+        icon: MessageSquare,
+        description: "Comunicación del equipo"
+      },
+      {
+        title: "Mis reuniones",
+        url: "/my-meetings",
+        icon: Video,
+        description: "Mis reuniones personales"
+      },
+      {
+        title: "Mis mensajes",
+        url: "/my-messages",
+        icon: MessageSquare,
+        description: "Mis mensajes personales"
+      },
+      {
+        title: "Archivados",
+        url: "/archived",
+        icon: Archive,
+        description: "Elementos archivados"
       }
     ]
   },

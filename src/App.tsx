@@ -18,6 +18,11 @@ import Reports from "./pages/Reports";
 import Mobile from "./pages/Mobile";
 import Permissions from "./pages/Permissions";
 import Settings from "./pages/Settings";
+import TeamMeetings from "./pages/TeamMeetings";
+import TeamMessages from "./pages/TeamMessages";
+import MyMeetings from "./pages/MyMeetings";
+import MyMessages from "./pages/MyMessages";
+import Archived from "./pages/Archived";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +42,11 @@ const App = () => (
         <Route path="/activities" element={<Activities />} />
         <Route path="/emails" element={<EmailMarketing />} />
         <Route path="/calendar" element={<Calendar />} />
+        <Route path="/team-meetings" element={<TeamMeetings />} />
+        <Route path="/team-messages" element={<TeamMessages />} />
+        <Route path="/my-meetings" element={<MyMeetings />} />
+        <Route path="/my-messages" element={<MyMessages />} />
+        <Route path="/archived" element={<Archived />} />
         <Route path="/workflows" element={<Workflows />} />
         <Route path="/ai-insights" element={<AIInsights />} />
         <Route path="/reports" element={<Reports />} />
