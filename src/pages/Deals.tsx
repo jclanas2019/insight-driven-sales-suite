@@ -8,10 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Target, DollarSign, Calendar, User } from "lucide-react";
+import { Plus, Search, Target, DollarSign, Calendar, User, Edit, Trash2 } from "lucide-react";
+import { EditDealDialog } from "@/components/EditDealDialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data for deals
-const mockDeals = [
+const mockDealsData = [
   {
     id: 1,
     name: "Proyecto Software ABC",
@@ -45,13 +48,53 @@ const mockDeals = [
 ];
 
 const Deals = () => {
+  const [deals, setDeals] = useState(mockDealsData);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingDeal, setEditingDeal] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deletingDeal, setDeletingDeal] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  const filteredDeals = mockDeals.filter(deal =>
+  const filteredDeals = deals.filter(deal =>
     deal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     deal.company.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEditDeal = (deal) => {
+    setEditingDeal(deal);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateDeal = (updatedDeal) => {
+    setDeals(prevDeals => 
+      prevDeals.map(deal => 
+        deal.id === updatedDeal.id ? updatedDeal : deal
+      )
+    );
+    toast({
+      title: "Oportunidad actualizada",
+      description: "Los datos se han actualizado correctamente.",
+    });
+  };
+
+  const handleDeleteDeal = (deal) => {
+    setDeletingDeal(deal);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteDeal = () => {
+    if (deletingDeal) {
+      setDeals(prevDeals => prevDeals.filter(deal => deal.id !== deletingDeal.id));
+      toast({
+        title: "Oportunidad eliminada",
+        description: "La oportunidad ha sido eliminada correctamente.",
+      });
+      setIsDeleteDialogOpen(false);
+      setDeletingDeal(null);
+    }
+  };
 
   const getStageColor = (stage: string) => {
     switch (stage) {
@@ -175,6 +218,7 @@ const Deals = () => {
                       <TableHead>Probabilidad</TableHead>
                       <TableHead>Cierre Estimado</TableHead>
                       <TableHead>Responsable</TableHead>
+                      <TableHead>Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -194,6 +238,24 @@ const Deals = () => {
                             {deal.owner}
                           </div>
                         </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditDeal(deal)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteDeal(deal)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -203,6 +265,21 @@ const Deals = () => {
           </div>
         </main>
       </div>
+
+      <EditDealDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        deal={editingDeal}
+        onUpdateDeal={handleUpdateDeal}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Eliminar Oportunidad"
+        description={`¿Estás seguro de que deseas eliminar "${deletingDeal?.name}"? Esta acción no se puede deshacer.`}
+        onConfirm={confirmDeleteDeal}
+      />
     </SidebarProvider>
   );
 };

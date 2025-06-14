@@ -8,10 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Phone, Mail, Calendar, Clock, User, Building2 } from "lucide-react";
+import { Plus, Search, Phone, Mail, Calendar, Clock, User, Building2, Edit, Trash2 } from "lucide-react";
+import { EditActivityDialog } from "@/components/EditActivityDialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data para actividades
-const mockActivities = [
+const mockActivitiesData = [
   {
     id: 1,
     type: "Llamada",
@@ -63,14 +66,54 @@ const mockActivities = [
 ];
 
 const Activities = () => {
+  const [activities, setActivities] = useState(mockActivitiesData);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deletingActivity, setDeletingActivity] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  const filteredActivities = mockActivities.filter(activity =>
+  const filteredActivities = activities.filter(activity =>
     activity.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
     activity.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
     activity.company.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEditActivity = (activity) => {
+    setEditingActivity(activity);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateActivity = (updatedActivity) => {
+    setActivities(prevActivities => 
+      prevActivities.map(activity => 
+        activity.id === updatedActivity.id ? updatedActivity : activity
+      )
+    );
+    toast({
+      title: "Actividad actualizada",
+      description: "Los datos se han actualizado correctamente.",
+    });
+  };
+
+  const handleDeleteActivity = (activity) => {
+    setDeletingActivity(activity);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteActivity = () => {
+    if (deletingActivity) {
+      setActivities(prevActivities => prevActivities.filter(activity => activity.id !== deletingActivity.id));
+      toast({
+        title: "Actividad eliminada",
+        description: "La actividad ha sido eliminada correctamente.",
+      });
+      setIsDeleteDialogOpen(false);
+      setDeletingActivity(null);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -204,6 +247,7 @@ const Activities = () => {
                       <TableHead>Estado</TableHead>
                       <TableHead>Duración</TableHead>
                       <TableHead>Responsable</TableHead>
+                      <TableHead>Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -235,6 +279,24 @@ const Activities = () => {
                             {activity.owner}
                           </div>
                         </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditActivity(activity)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteActivity(activity)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -244,6 +306,21 @@ const Activities = () => {
           </div>
         </main>
       </div>
+
+      <EditActivityDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        activity={editingActivity}
+        onUpdateActivity={handleUpdateActivity}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Eliminar Actividad"
+        description={`¿Estás seguro de que deseas eliminar "${deletingActivity?.subject}"? Esta acción no se puede deshacer.`}
+        onConfirm={confirmDeleteActivity}
+      />
     </SidebarProvider>
   );
 };
