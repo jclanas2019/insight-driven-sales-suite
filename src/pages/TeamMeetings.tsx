@@ -1,4 +1,3 @@
-
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Calendar, Clock, Video, Plus } from "lucide-react";
 import { NewTeamMeetingDialog } from "@/components/dialogs/NewTeamMeetingDialog";
+import { AddTeamDialog } from "@/components/dialogs/AddTeamDialog";
 
 const TeamMeetings = () => {
   const handleMeetingCreated = () => {
     // Aquí se podría actualizar la lista de reuniones
     console.log("Nueva reunión de equipo creada");
+  };
+
+  const handleTeamAdded = () => {
+    // Aquí se podría actualizar la lista de equipos
+    console.log("Nuevo equipo agregado");
   };
 
   const handleJoinMeeting = (meetingTitle: string) => {
@@ -36,7 +41,10 @@ const TeamMeetings = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Reuniones de mi equipo</h1>
               </div>
             </div>
-            <NewTeamMeetingDialog onMeetingCreated={handleMeetingCreated} />
+            <div className="flex items-center space-x-2">
+              <AddTeamDialog onTeamAdded={handleTeamAdded} />
+              <NewTeamMeetingDialog onMeetingCreated={handleMeetingCreated} />
+            </div>
           </div>
 
           <div className="p-6 space-y-6">

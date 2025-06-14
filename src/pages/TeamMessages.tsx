@@ -1,4 +1,3 @@
-
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Send, Users, Clock, Plus } from "lucide-react";
 import { NewTeamMessageDialog } from "@/components/dialogs/NewTeamMessageDialog";
+import { AddTeamDialog } from "@/components/dialogs/AddTeamDialog";
 
 const TeamMessages = () => {
   const handleMessageSent = () => {
     // Aquí se podría actualizar la lista de mensajes
     console.log("Nuevo mensaje de equipo enviado");
+  };
+
+  const handleTeamAdded = () => {
+    // Aquí se podría actualizar la lista de equipos
+    console.log("Nuevo equipo agregado");
   };
 
   const handleOpenMessage = (subject: string) => {
@@ -31,7 +36,10 @@ const TeamMessages = () => {
                 <h1 className="text-xl font-semibold text-slate-900">Mensajes de mi equipo</h1>
               </div>
             </div>
-            <NewTeamMessageDialog onMessageSent={handleMessageSent} />
+            <div className="flex items-center space-x-2">
+              <AddTeamDialog onTeamAdded={handleTeamAdded} />
+              <NewTeamMessageDialog onMessageSent={handleMessageSent} />
+            </div>
           </div>
 
           <div className="p-6 space-y-6">
