@@ -83,14 +83,14 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="bg-blue-600 hover:bg-blue-700">
+          <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm">
             <Plus className="w-4 h-4 mr-2" />
             Invita a tu equipo
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] border border-slate-200 shadow-lg">
+        <DialogHeader className="border-b border-slate-100 pb-4">
           <DialogTitle className="flex items-center space-x-2">
             <UserPlus className="w-5 h-5 text-blue-600" />
             <span>Invita a tu equipo</span>
@@ -99,7 +99,7 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
             Ingresa el correo de los ejecutivos a quienes quieras invitar a usar diio. Presiona [Enter] para agregar cada correo
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
             <Label htmlFor="email-input">Correos electrónicos</Label>
             <Input
@@ -109,6 +109,7 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
               onChange={(e) => setEmailInput(e.target.value)}
               onKeyPress={handleEmailKeyPress}
               placeholder="Ej: ejecutivo@empresa.com"
+              className="border-slate-200"
             />
             <p className="text-xs text-slate-500">Presiona Enter para agregar cada correo</p>
           </div>
@@ -116,9 +117,9 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
           {emails.length > 0 && (
             <div className="space-y-2">
               <Label>Correos agregados ({emails.length})</Label>
-              <div className="space-y-1 max-h-32 overflow-y-auto">
+              <div className="space-y-1 max-h-32 overflow-y-auto border border-slate-200 rounded-md p-2">
                 {emails.map((email, index) => (
-                  <div key={index} className="flex items-center justify-between bg-slate-50 rounded px-2 py-1 text-sm">
+                  <div key={index} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded px-2 py-1 text-sm">
                     <span>{email}</span>
                     <Button
                       type="button"
@@ -135,7 +136,7 @@ export function AddTeamDialog({ trigger, onTeamAdded }: AddTeamDialogProps) {
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="border-t border-slate-100 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>

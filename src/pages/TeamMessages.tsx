@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +29,7 @@ const TeamMessages = () => {
       <div className="min-h-screen flex w-full bg-slate-50">
         <CRMSidebar />
         <main className="flex-1">
-          <div className="border-b border-slate-200 bg-white p-4 flex items-center justify-between">
+          <div className="border-b border-slate-200 bg-white p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center space-x-4">
               <SidebarTrigger className="mr-4" />
               <div className="flex items-center space-x-2">
@@ -44,7 +45,7 @@ const TeamMessages = () => {
 
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
+              <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <CardHeader>
                   <CardTitle className="text-lg">No Leídos</CardTitle>
                 </CardHeader>
@@ -54,7 +55,7 @@ const TeamMessages = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <CardHeader>
                   <CardTitle className="text-lg">Hoy</CardTitle>
                 </CardHeader>
@@ -64,7 +65,7 @@ const TeamMessages = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <CardHeader>
                   <CardTitle className="text-lg">Esta Semana</CardTitle>
                 </CardHeader>
@@ -74,7 +75,7 @@ const TeamMessages = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <CardHeader>
                   <CardTitle className="text-lg">Respuesta Promedio</CardTitle>
                 </CardHeader>
@@ -85,14 +86,14 @@ const TeamMessages = () => {
               </Card>
             </div>
 
-            <Card>
-              <CardHeader>
+            <Card className="border border-slate-200 shadow-sm">
+              <CardHeader className="border-b border-slate-100">
                 <CardTitle>Conversaciones del Equipo</CardTitle>
                 <CardDescription>
                   Mensajes y comunicaciones del equipo de ventas
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <div className="space-y-4">
                   {[
                     {
@@ -128,7 +129,7 @@ const TeamMessages = () => {
                       preview: "Comparto el feedback recibido del cliente principal..."
                     }
                   ].map((message, index) => (
-                    <div key={index} className={`border rounded-lg p-4 hover:bg-slate-50 transition-colors ${message.unread ? 'bg-blue-50 border-blue-200' : ''}`}>
+                    <div key={index} className={`border border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm ${message.unread ? 'bg-blue-50 border-blue-200' : ''}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
