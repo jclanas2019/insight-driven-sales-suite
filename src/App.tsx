@@ -14,6 +14,7 @@ import EmailMarketing from "./pages/EmailMarketing";
 import Calendar from "./pages/Calendar";
 import Workflows from "./pages/Workflows";
 import AIInsights from "./pages/AIInsights";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/workflows" element={<Workflows />} />
         <Route path="/ai-insights" element={<AIInsights />} />
+        <Route path="/reports" element={<Reports />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
