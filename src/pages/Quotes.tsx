@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
@@ -6,6 +7,10 @@ import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { QuotesHeader } from "@/components/QuotesHeader";
 import { QuotesStats } from "@/components/QuotesStats";
 import { QuotesTabs } from "@/components/QuotesTabs";
+import { MeetingRecorder } from "@/components/MeetingRecorder";
+import { ConversationAnalysis } from "@/components/ConversationAnalysis";
+import { SalesCoaching } from "@/components/SalesCoaching";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
 interface Quote {
@@ -119,15 +124,38 @@ const Quotes = () => {
           <div className="p-6 space-y-6">
             <QuotesStats quotes={quotes} />
             
-            <QuotesTabs
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              quotes={quotes}
-              selectedQuote={selectedQuote}
-              onRowClick={handleRowClick}
-              onEditQuote={setEditingQuote}
-              onDeleteQuote={setDeletingQuote}
-            />
+            <Tabs defaultValue="cotizaciones" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="cotizaciones">Cotizaciones</TabsTrigger>
+                <TabsTrigger value="reuniones">Grabación de Reuniones</TabsTrigger>
+                <TabsTrigger value="analisis">Análisis de Conversación</TabsTrigger>
+                <TabsTrigger value="coaching">Coaching de Vendedores</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="cotizaciones" className="mt-6">
+                <QuotesTabs
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  quotes={quotes}
+                  selectedQuote={selectedQuote}
+                  onRowClick={handleRowClick}
+                  onEditQuote={setEditingQuote}
+                  onDeleteQuote={setDeletingQuote}
+                />
+              </TabsContent>
+              
+              <TabsContent value="reuniones" className="mt-6">
+                <MeetingRecorder />
+              </TabsContent>
+              
+              <TabsContent value="analisis" className="mt-6">
+                <ConversationAnalysis />
+              </TabsContent>
+              
+              <TabsContent value="coaching" className="mt-6">
+                <SalesCoaching />
+              </TabsContent>
+            </Tabs>
           </div>
 
           <EditQuoteDialog
