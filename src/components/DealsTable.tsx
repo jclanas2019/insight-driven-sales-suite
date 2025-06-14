@@ -6,17 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, User, Edit, Trash2 } from "lucide-react";
-
-interface Deal {
-  id: number;
-  name: string;
-  company: string;
-  value: number;
-  stage: string;
-  probability: number;
-  closeDate: string;
-  owner: string;
-}
+import { Deal } from "@/types/dashboard";
+import { useDealScoring } from "@/hooks/useDealScoring";
 
 interface DealsTableProps {
   deals: Deal[];
@@ -26,6 +17,7 @@ interface DealsTableProps {
 
 export const DealsTable = ({ deals, onEditDeal, onDeleteDeal }: DealsTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { calculateScore, getScoreColor, getScoreLabel } = useDealScoring();
 
   const filteredDeals = deals.filter(deal =>
     deal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,7 +40,7 @@ export const DealsTable = ({ deals, onEditDeal, onDeleteDeal }: DealsTableProps)
       <CardHeader>
         <CardTitle>Pipeline de Ventas</CardTitle>
         <CardDescription>
-          Gestiona tus oportunidades de venta y pipeline comercial
+          Gestiona tus oportunidades de venta y pipeline comercial con sistema de scoring inteligente
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -71,6 +63,8 @@ export const DealsTable = ({ deals, onEditDeal, onDeleteDeal }: DealsTableProps)
               <TableHead>Empresa</TableHead>
               <TableHead>Valor</TableHead>
               <TableHead>Etapa</TableHead>
+              <TableHead>Nivel Madurez</TableHead>
+              <TableHead>Score</TableHead>
               <TableHead>Probabilidad</TableHead>
               <TableHead>Cierre Estimado</TableHead>
               <TableHead>Responsable</TableHead>
@@ -78,42 +72,53 @@ export const DealsTable = ({ deals, onEditDeal, onDeleteDeal }: DealsTableProps)
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDeals.map((deal) => (
-              <TableRow key={deal.id}>
-                <TableCell className="font-medium">{deal.name}</TableCell>
-                <TableCell>{deal.company}</TableCell>
-                <TableCell>${deal.value.toLocaleString()}</TableCell>
-                <TableCell>
-                  <Badge className={getStageColor(deal.stage)}>{deal.stage}</Badge>
-                </TableCell>
-                <TableCell>{deal.probability}%</TableCell>
-                <TableCell>{deal.closeDate}</TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <User className="w-4 h-4 mr-2 text-gray-400" />
-                    {deal.owner}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEditDeal(deal)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onDeleteDeal(deal)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {filteredDeals.map((deal) => {
+              const score = calculateScore(deal);
+              return (
+                <TableRow key={deal.id}>
+                  <TableCell className="font-medium">{deal.name}</TableCell>
+                  <TableCell>{deal.company}</TableCell>
+                  <TableCell>${deal.value.toLocaleString()}</TableCell>
+                  <TableCell>
+                    <Badge className={getStageColor(deal.stage)}>{deal.stage}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getScoreColor(score.level)}>
+                      {getScoreLabel(score.level)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-semibold">{score.total}/100</span>
+                  </TableCell>
+                  <TableCell>{deal.probability}%</TableCell>
+                  <TableCell>{deal.closeDate}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <User className="w-4 h-4 mr-2 text-gray-400" />
+                      {deal.owner}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEditDeal(deal)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDeleteDeal(deal)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </CardContent>

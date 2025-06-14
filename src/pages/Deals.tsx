@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CRMSidebar } from "@/components/CRMSidebar";
@@ -9,9 +8,10 @@ import { AddDealDialog } from "@/components/AddDealDialog";
 import { DealsStatistics } from "@/components/DealsStatistics";
 import { DealsTable } from "@/components/DealsTable";
 import { useToast } from "@/hooks/use-toast";
+import { Deal } from "@/types/dashboard";
 
-// Mock data for deals
-const mockDealsData = [
+// Mock data actualizado con campos de scoring
+const mockDealsData: Deal[] = [
   {
     id: 1,
     name: "Proyecto Software ABC",
@@ -20,7 +20,12 @@ const mockDealsData = [
     stage: "Propuesta",
     probability: 70,
     closeDate: "2025-07-15",
-    owner: "Ana García"
+    owner: "Ana García",
+    interactions: { calls: 8, emails: 15, meetings: 3 },
+    lastActivity: "2025-06-12",
+    companySize: "large",
+    industry: "Tecnología",
+    leadActivity: "high"
   },
   {
     id: 2,
@@ -30,7 +35,12 @@ const mockDealsData = [
     stage: "Negociación",
     probability: 85,
     closeDate: "2025-06-30",
-    owner: "Carlos López"
+    owner: "Carlos López",
+    interactions: { calls: 3, emails: 8, meetings: 1 },
+    lastActivity: "2025-06-10",
+    companySize: "medium",
+    industry: "Marketing",
+    leadActivity: "medium"
   },
   {
     id: 3,
@@ -40,7 +50,12 @@ const mockDealsData = [
     stage: "Calificación",
     probability: 45,
     closeDate: "2025-08-10",
-    owner: "María Rodríguez"
+    owner: "María Rodríguez",
+    interactions: { calls: 1, emails: 3, meetings: 0 },
+    lastActivity: "2025-05-28",
+    companySize: "small",
+    industry: "Retail",
+    leadActivity: "low"
   }
 ];
 
